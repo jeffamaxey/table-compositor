@@ -74,7 +74,7 @@ def basic_example3():
     def index_style_func(node):
         # node.key here could be one of (1,), (1, 100), (2,), (2, 100), (2, 200)
         bg_color = "FFFFFF"
-        if node.key == (1,) or node.key == (2,):
+        if node.key in [(1,), (2,)]:
             bg_color = "9E80B8"
         elif node.key[1] == 100:
             bg_color = "4F90C1"
@@ -84,7 +84,7 @@ def basic_example3():
 
     def header_style_func(node):
         bg_color = "FFFFFF"
-        if node.key == ("A",) or node.key == ("B",):
+        if node.key in [("A",), ("B",)]:
             bg_color = "9E80B8"
         elif node.key[1] == "x":
             bg_color = "4F90C1"

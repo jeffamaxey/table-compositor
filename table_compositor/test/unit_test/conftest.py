@@ -57,8 +57,8 @@ class XlsxCallBackFunc(CallBackFuncInterface):
         return self.df.loc[i, c]
 
     def data_style_func(self, i, c):
-        number_format = '_($* #,##0_);_($* (#,##0);_($* "-"??_);_(@_)'
         if c == "b":
+            number_format = '_($* #,##0_);_($* (#,##0);_($* "-"??_);_(@_)'
             return OpenPyxlStyleHelper.get_style(
                 number_format=number_format,
                 border=OpenPyxlStyleHelper.CustomBorders.thin_black_border,
@@ -78,27 +78,23 @@ class XlsxCallBackFunc(CallBackFuncInterface):
         color = "FFFF00"
         if node.value == "a":
             color = "9BC2E6"
-        if node.value == "b":
+        elif node.value == "b":
             color = "A9D08E"
         return OpenPyxlStyleHelper.get_style(
             bg_color=color, border=OpenPyxlStyleHelper.CustomBorders.thin_black_border
         )
 
     def header_value_func(self, node):
-        if node.value == "c":
-            return "Flag"
-        return node.value
+        return "Flag" if node.value == "c" else node.value
 
     def index_value_func(self, node):
-        if node.key == ("a", 1):
-            return "Aa"
-        return node.value
+        return "Aa" if node.key == ("a", 1) else node.value
 
     def index_style_func(self, node):
         color = "FFFF00"
         if node.value == "a":
             color = "9BC2E6"
-        if node.value == "b":
+        elif node.value == "b":
             color = "A9D08E"
         return OpenPyxlStyleHelper.get_style(
             bg_color=color, border=OpenPyxlStyleHelper.CustomBorders.thin_black_border
@@ -122,8 +118,8 @@ class XlsxCallBackFuncXlsxWriter(CallBackFuncInterface):
         return self.df.loc[i, c]
 
     def data_style_func(self, i, c):
-        number_format = '_($* #,##0_);_($* (#,##0);_($* "-"??_);_(@_)'
         if c == "b":
+            number_format = '_($* #,##0_);_($* (#,##0);_($* "-"??_);_(@_)'
             return XlsxWriterStyleHelper.get_style(number_format=number_format)
 
         if self.df.loc[i, c] >= 0.2 and c == "a":
@@ -135,25 +131,21 @@ class XlsxCallBackFuncXlsxWriter(CallBackFuncInterface):
         color = "FFFF00"
         if node.value == "a":
             color = "9BC2E6"
-        if node.value == "b":
+        elif node.value == "b":
             color = "A9D08E"
         return XlsxWriterStyleHelper.get_style(bg_color=color)
 
     def header_value_func(self, node):
-        if node.value == "c":
-            return "Flag"
-        return node.value
+        return "Flag" if node.value == "c" else node.value
 
     def index_value_func(self, node):
-        if node.key == ("a", 1):
-            return "Aa"
-        return node.value
+        return "Aa" if node.key == ("a", 1) else node.value
 
     def index_style_func(self, node):
         color = "FFFF00"
         if node.value == "a":
             color = "9BC2E6"
-        if node.value == "b":
+        elif node.value == "b":
             color = "A9D08E"
         return XlsxWriterStyleHelper.get_style(bg_color=color)
 
@@ -301,16 +293,15 @@ def get_multi_hierarchical_df_with_layouts(
             warnings.simplefilter("ignore")
             layout_model.data.values.loc[("a", 2), ("a", 1)] = layout_model_inner
 
-    if grid:
-        layout = [
+    return (
+        [
             [layout_model_inner, layout_model, layout_model],
             [layout_model, layout_model_inner],
             [layout_model_inner],
         ]
-    else:
-        layout = [layout_model]
-
-    return layout
+        if grid
+        else [layout_model]
+    )
 
 
 class ScenarioFunc(tp.Protocol):

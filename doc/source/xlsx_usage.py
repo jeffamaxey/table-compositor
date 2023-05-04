@@ -62,8 +62,7 @@ def sample_names_data():
 def top_names_for_year(year=2015, gender="F", top_n=5):
     df = load_names_data()
     df = df[(df["year"] == year) & (df["gender"] == gender)]
-    df = df.sort_values("count")[:top_n]
-    return df
+    return df.sort_values("count")[:top_n]
 
 
 # end_data_routine
@@ -108,9 +107,7 @@ class XLSXExample2:
     def data_value_func(df):
         def _inner(idx, col):
             if col == "gender":
-                if df.loc[idx, col] == "F":
-                    return "Female"
-                return "Male"
+                return "Female" if df.loc[idx, col] == "F" else "Male"
             return df.loc[idx, col]
 
         return _inner
@@ -122,10 +119,7 @@ class XLSXExample2:
             number_format = "General"
             if col == "count":
                 number_format = "#,##0"
-            if df.loc[idx, "gender"] == "F":
-                bg_color = "bbdef8"
-            else:
-                bg_color = "e3f2fd"
+            bg_color = "bbdef8" if df.loc[idx, "gender"] == "F" else "e3f2fd"
             return xlsstyle.OpenPyxlStyleHelper.get_style(
                 bg_color=bg_color, number_format=number_format
             )
@@ -156,10 +150,7 @@ class XLSXExample2:
     def index_style_func(df):
         def _inner(node):
             bg_color = None
-            if df.loc[node.value, "gender"] == "F":
-                bg_color = "bbdef8"
-            else:
-                bg_color = "e3f2fd"
+            bg_color = "bbdef8" if df.loc[node.value, "gender"] == "F" else "e3f2fd"
             return xlsstyle.OpenPyxlStyleHelper.get_style(bg_color=bg_color)
 
         return _inner
@@ -204,9 +195,7 @@ class XLSXExample3:
     def data_value_func(df):
         def _inner(idx, col):
             if col == "gender":
-                if df.loc[idx, col] == "F":
-                    return "Female"
-                return "Male"
+                return "Female" if df.loc[idx, col] == "F" else "Male"
             return df.loc[idx, col]
 
         return _inner
@@ -218,10 +207,7 @@ class XLSXExample3:
             number_format = "General"
             if col == "count":
                 number_format = "#,##0"
-            if df.loc[idx, "gender"] == "F":
-                bg_color = "bbdef8"
-            else:
-                bg_color = "e3f2fd"
+            bg_color = "bbdef8" if df.loc[idx, "gender"] == "F" else "e3f2fd"
             return xlsstyle.OpenPyxlStyleHelper.get_style(
                 bg_color=bg_color, number_format=number_format
             )
@@ -252,10 +238,7 @@ class XLSXExample3:
     def index_style_func(df):
         def _inner(node):
             bg_color = None
-            if df.loc[node.value, "gender"] == "F":
-                bg_color = "bbdef8"
-            else:
-                bg_color = "e3f2fd"
+            bg_color = "bbdef8" if df.loc[node.value, "gender"] == "F" else "e3f2fd"
             return xlsstyle.OpenPyxlStyleHelper.get_style(bg_color=bg_color)
 
         return _inner
@@ -333,10 +316,7 @@ class XLSXExample4:
             number_format = "General"
             if col == "count":
                 number_format = "#,##0"
-            if idx[1] == "F":
-                bg_color = "bbdef8"
-            else:
-                bg_color = "e3f2fd"
+            bg_color = "bbdef8" if idx[1] == "F" else "e3f2fd"
             return xlsstyle.OpenPyxlStyleHelper.get_style(
                 bg_color=bg_color, number_format=number_format
             )
@@ -361,9 +341,7 @@ class XLSXExample4:
 
     @staticmethod
     def index_value_func(node):
-        if isinstance(node.value, str):
-            return node.value.capitalize()
-        return node.value
+        return node.value.capitalize() if isinstance(node.value, str) else node.value
 
     @staticmethod
     def index_style_func(df):

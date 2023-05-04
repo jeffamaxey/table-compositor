@@ -63,8 +63,7 @@ def sample_names_data():
 def top_names_for_year(year=2015, gender="F", top_n=5):
     df = load_names_data()
     df = df[(df["year"] == year) & (df["gender"] == gender)]
-    df = df.sort_values("count")[:top_n]
-    return df
+    return df.sort_values("count")[:top_n]
 
 
 # end_data_routine
@@ -108,9 +107,7 @@ class HTMLExample2:
     def data_value_func(df):
         def _inner(idx, col):
             if col == "gender":
-                if df.loc[idx, col] == "F":
-                    return "Female"
-                return "Male"
+                return "Female" if df.loc[idx, col] == "F" else "Male"
             return df.loc[idx, col]
 
         return _inner
@@ -122,10 +119,7 @@ class HTMLExample2:
             text_align = "left"
             if col == "count":
                 text_align = "right"
-            if df.loc[idx, "gender"] == "F":
-                color = "#bbdef8"
-            else:
-                color = "#e3f2fd"
+            color = "#bbdef8" if df.loc[idx, "gender"] == "F" else "#e3f2fd"
             return html_style.td_style(
                 text_align=text_align,
                 background_color=color,
@@ -214,9 +208,7 @@ class HTMLExample3:
     def data_value_func(df):
         def _inner(idx, col):
             if col == "gender":
-                if df.loc[idx, col] == "F":
-                    return "Female"
-                return "Male"
+                return "Female" if df.loc[idx, col] == "F" else "Male"
             return df.loc[idx, col]
 
         return _inner
@@ -228,10 +220,7 @@ class HTMLExample3:
             text_align = "left"
             if col == "count":
                 text_align = "right"
-            if df.loc[idx, "gender"] == "F":
-                color = "#bbdef8"
-            else:
-                color = "#e3f2fd"
+            color = "#bbdef8" if df.loc[idx, "gender"] == "F" else "#e3f2fd"
             return html_style.td_style(
                 text_align=text_align,
                 background_color=color,
@@ -266,9 +255,7 @@ class HTMLExample3:
 
     @staticmethod
     def index_value_func(node):
-        if isinstance(node.value, str):
-            return node.value.capitalize()
-        return node.value
+        return node.value.capitalize() if isinstance(node.value, str) else node.value
 
     @staticmethod
     def index_style_func(node):
@@ -349,9 +336,7 @@ class HTMLExample4:
     def data_value_func(df):
         def _inner(idx, col):
             if col == "gender":
-                if df.loc[idx, col] == "F":
-                    return "Female"
-                return "Male"
+                return "Female" if df.loc[idx, col] == "F" else "Male"
             return df.loc[idx, col]
 
         return _inner
@@ -363,11 +348,7 @@ class HTMLExample4:
             text_align = "left"
             if col == "count":
                 text_align = "right"
-            if idx[1] == "F":
-                color = "#bbdef8"
-            else:
-                color = "#e3f2fd"
-
+            color = "#bbdef8" if idx[1] == "F" else "#e3f2fd"
             return html_style.td_style(
                 text_align=text_align,
                 background_color=color,
@@ -402,9 +383,7 @@ class HTMLExample4:
 
     @staticmethod
     def index_value_func(node):
-        if isinstance(node.value, str):
-            return node.value.capitalize()
-        return node.value
+        return node.value.capitalize() if isinstance(node.value, str) else node.value
 
     @staticmethod
     def index_style_func(node):

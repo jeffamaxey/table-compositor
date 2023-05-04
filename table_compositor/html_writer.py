@@ -10,13 +10,12 @@ from table_compositor.presentation_model import StyleWrapper
 class HTMLWriter:
     @staticmethod
     def _wrap_table_element(element, attrs, value):
-        _attrs = " ".join("{}='{}'".format(k, v) for k, v in sorted(attrs.items()))
+        _attrs = " ".join(f"{k}='{v}'" for k, v in sorted(attrs.items()))
         _attrs = _attrs.strip(" ")
-        _attrs = " " + _attrs if _attrs else ""
-        s = "<{elem}{elem_attr}>{v}</{elem}>\n".format(
+        _attrs = f" {_attrs}" if _attrs else ""
+        return "<{elem}{elem_attr}>{v}</{elem}>\n".format(
             elem=element, elem_attr=_attrs, v=value
         )
-        return s
 
     @staticmethod
     def style_to_str(style):
@@ -30,7 +29,7 @@ class HTMLWriter:
         if isinstance(style, str):
             return style
         d = {k.replace("_", "-"): v for k, v in style.items()}
-        d = ";".join("{}:{}".format(k, v) for k, v in sorted(d.items()) if v)
+        d = ";".join(f"{k}:{v}" for k, v in sorted(d.items()) if v)
         return d
 
     @staticmethod
@@ -65,7 +64,7 @@ class HTMLWriter:
         for _, offsets in groupby(sorted(row_col_dict), key=lambda x: (x[0])):
             trs.append(wrap_tr(list(offsets)))
 
-        table_attrs = kwargs or dict()
+        table_attrs = kwargs or {}
         return HTMLWriter._wrap_table_element("table", table_attrs, "".join(trs))
 
     @staticmethod
@@ -79,15 +78,13 @@ class HTMLWriter:
         )
 
         html = ["<table>"]
-        for i, values in enumerate(new_grid):
+        for values in new_grid:
             html.append("<tr>")
-            for j, value in enumerate(values):
+            for value in values:
                 if not value:
                     html.append("<td></td>")
                 else:
-                    html.append("<td>")
-                    html.append(value)
-                    html.append("</td>")
+                    html.extend(("<td>", value, "</td>"))
             html.append("</tr>")
         html.append("</table>")
 
@@ -96,30 +93,21 @@ class HTMLWriter:
     @staticmethod
     def _grid_to_html(cell, **kwargs):
         if isinstance(cell.children, dict):
-            html = HTMLWriter._to_html(cell.children, **kwargs)
-            return html
-
+            return HTMLWriter._to_html(cell.children, **kwargs)
         if isinstance(cell.children, Cell):
             return HTMLWriter._grid_to_html(cell.children, **kwargs)
 
-        tables = []
         if isinstance(cell.children, list):
-            for c in cell.children:
-                tables.append(HTMLWriter._grid_to_html(c, **kwargs))
-
+            tables = [HTMLWriter._grid_to_html(c, **kwargs) for c in cell.children]
             if len(tables) == 1:
                 return tables[0]
-            html = ""
-            for table in tables:
-                if cell.vertical:
-                    html += (
-                        '<tr style="vertical-align:top;"><td style="vertical-align:top;">'
-                        + table
-                        + "</td></tr>"
-                    )
-                else:
-                    html += '<td style="vertical-align:top">' + table + "</td>"
-            return "<table>" + html + "</table>"
+            html = "".join(
+                f'<tr style="vertical-align:top;"><td style="vertical-align:top;">{table}</td></tr>'
+                if cell.vertical
+                else f'<td style="vertical-align:top">{table}</td>'
+                for table in tables
+            )
+            return f"<table>{html}</table>"
 
     @staticmethod
     def to_html(layout, orientation="vertical", **kwargs):

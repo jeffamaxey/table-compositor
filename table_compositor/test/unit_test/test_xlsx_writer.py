@@ -15,8 +15,7 @@ from table_compositor.test.unit_test.conftest import (
 def get_expected_output_folder(fname: str) -> str:
     base_path = os.path.join(os.path.dirname(__file__), "..", "expected")
     os.makedirs(base_path, exist_ok=True)
-    expected_fp = os.path.join(base_path, fname)
-    return expected_fp
+    return os.path.join(base_path, fname)
 
 
 def _revalidate(expected_fp: str, output_fp: str) -> None:
@@ -50,7 +49,7 @@ def test_xlsx_writer(scenario: Scenario) -> None:
     )
 
     # we drop the engine name from the test, since the expected file is the same for both engines
-    fname = scenario.name.replace("_" + scenario.engine.__name__, "") + ".xlsx"
+    fname = scenario.name.replace(f"_{scenario.engine.__name__}", "") + ".xlsx"
 
     # this is a quick hack to have the same expected fp for for pandas and static_frame
     expected_fname = fname.replace("_static_frame", "").replace("_pandas", "")

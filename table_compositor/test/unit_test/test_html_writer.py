@@ -22,10 +22,7 @@ class HtmlCallBackFunc:
 
     @staticmethod
     def _to_dollar_format(v):
-        if not isinstance(v, (np.float, np.int)):
-            return v
-        r = "${:0,.0f}".format(v)
-        return r
+        return "${:0,.0f}".format(v) if isinstance(v, (np.float, np.int)) else v
 
     def data_value_func(self, r, c):
         return df_type_to_str(self.df.loc[r, c])
@@ -63,8 +60,7 @@ class HtmlCallBackFunc:
 def get_expected_output_folder(fname: str) -> str:
     base_path = os.path.join(os.path.dirname(__file__), "..", "expected")
     os.makedirs(base_path, exist_ok=True)
-    expected_fp = os.path.join(base_path, fname)
-    return expected_fp
+    return os.path.join(base_path, fname)
 
 
 @mark.parametrize("scenario", get_scenarios())
@@ -76,7 +72,7 @@ def test_html_writer(scenario: Scenario) -> None:
     )
 
     # we drop the engine name from the test, since the expected file is the same for both engines
-    fname = scenario.name.replace("_" + scenario.engine.__name__, "") + ".html"
+    fname = scenario.name.replace(f"_{scenario.engine.__name__}", "") + ".html"
 
     actual_html_str = htmlw.HTMLWriter.to_html(
         layout, orientation=scenario.orientation, border=1

@@ -72,6 +72,6 @@ def test_grid_layout_manager(grid_fixture: GridFixture) -> None:
 
     # to get the dict of coords for testing
     f = lambda x, pm: {**x, **{(pm.i, pm.j): pm}}
-    actual_dict = glm.GridLayoutManager.foldl(shifted_grid[1], f, dict())
+    actual_dict = glm.GridLayoutManager.foldl(shifted_grid[1], f, {})
 
     assert sorted(actual_dict) == sorted(expected)

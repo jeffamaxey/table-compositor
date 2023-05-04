@@ -45,8 +45,8 @@ class GridLayoutManager:
             r = GridLayoutManager.traverse(cell.children, f)
             return Cell(vertical=cell.vertical, children=r)
 
-        child_values = []
         if isinstance(cell.children, list):
+            child_values = []
             for child in cell.children:
                 r = GridLayoutManager.traverse(child, f)
                 child_values.append(r)
@@ -79,7 +79,7 @@ class GridLayoutManager:
             return (offset, new_c)
 
         if isinstance(cell.children, Cell):
-            result = GridLayoutManager.shift_grid(
+            return GridLayoutManager.shift_grid(
                 cell.children,
                 i,
                 j,
@@ -89,11 +89,6 @@ class GridLayoutManager:
                 h_shift_by,
                 v_shift_by,
             )
-
-            # print(('-----'))
-            # print('result=', result)
-            return result
-
         child_values = []
         row, col = i, j
         new_max_row, new_max_col = 0, 0
@@ -145,7 +140,7 @@ class GridLayoutManager:
         )
 
         f = lambda accum, pm: {**accum, **to_row_col_dict(pm)}
-        return GridLayoutManager.foldl(shifted_grid, f, dict())
+        return GridLayoutManager.foldl(shifted_grid, f, {})
 
     @staticmethod
     def compute_grid(layout, orientation="vertical"):

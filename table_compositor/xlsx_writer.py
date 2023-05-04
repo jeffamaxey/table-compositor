@@ -24,16 +24,15 @@ class _XLSXCompositor:
 
     @classmethod
     def _build_row_col_dict(cls, layout, orientation, h_shift_by, v_shift_by):
-        row_col_dict = GridLayoutManager.get_row_col_dict(
+        return GridLayoutManager.get_row_col_dict(
             layout,
             orientation=orientation,
             h_shift_by=h_shift_by,
             v_shift_by=v_shift_by,
         )
-        return row_col_dict
 
     @classmethod
-    def to_xlsx_worksheet(self, *args, **kwargs):
+    def to_xlsx_worksheet(cls, *args, **kwargs):
         raise NotImplementedError(
             "Derived classes need to implement this function depending on the xlsx writer engine"
         )
@@ -57,10 +56,9 @@ class OpenPyxlCompositor(_XLSXCompositor):
     def _get_range_string(cls, offsets):
         r1, c1, r2, c2 = offsets
 
-        range_string = cls.RANGE_STRING.format(
+        return cls.RANGE_STRING.format(
             cls._get_column_letter(c1), r1, cls._get_column_letter(c2), r2
         )
-        return range_string
 
     @classmethod
     def _to_xlsx_worksheet(cls, row_col_dict, ws, column_width, post_process_ws_func):
@@ -204,7 +202,7 @@ class XlsxWriterCompositor(_XLSXCompositor):
         # column level work only once for each column
         for offsets in row_col_dict:
             col_letter = _XLSXCompositor._get_column_letter(offsets[1] + 1)
-            ws.set_column(col_letter + ":" + col_letter, column_width)
+            ws.set_column(f"{col_letter}:{col_letter}", column_width)
         if post_process_ws_func:
             post_process_ws_func(ws)
 
@@ -310,8 +308,7 @@ class XLSXWriter(OpenPyxlCompositor):
             raise RuntimeError(
                 f"Sheet name must be 31 or fewer characters. {sheet_name=} is {len(sheet_name)} characters."
             )
-        ws = wb.create_sheet(title=sheet_name)
-        return ws
+        return wb.create_sheet(title=sheet_name)
 
     @classmethod
     def to_xlsx_worksheet(

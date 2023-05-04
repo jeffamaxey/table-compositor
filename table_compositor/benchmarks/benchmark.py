@@ -106,10 +106,9 @@ class XlsxCallBackFuncXlsxWriter:
 
 
 def prepare_dataframe(n_rows, n_cols):
-    columns = ["col_" + str(i) for i in range(0, n_cols)]
+    columns = [f"col_{str(i)}" for i in range(0, n_cols)]
     data = np.random.rand(n_rows, n_cols)
-    df = pd.DataFrame(data, columns=columns, index=range(0, n_rows))
-    return df
+    return pd.DataFrame(data, columns=columns, index=range(0, n_rows))
 
 
 def _create_presentation_model(df, callback_func_cls, slow=0):
@@ -156,13 +155,11 @@ def _create_presentation_model(df, callback_func_cls, slow=0):
 
 
 def create_presentation_model_for_xlsx_writer(df, slow=0):
-    pm = _create_presentation_model(df, XlsxCallBackFuncXlsxWriter, slow=slow)
-    return pm
+    return _create_presentation_model(df, XlsxCallBackFuncXlsxWriter, slow=slow)
 
 
 def create_presentation_model_for_openpyxl_writer(df, slow=0):
-    pm = _create_presentation_model(df, XlsxCallBackFuncOpenPyxl, slow)
-    return pm
+    return _create_presentation_model(df, XlsxCallBackFuncOpenPyxl, slow)
 
 
 def write_using_openpyxl(pm_openpyxl):

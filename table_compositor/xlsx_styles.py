@@ -423,6 +423,6 @@ class XlsxWriterStyleHelper:
             bottom_color=border["bottom"]["color"],
             right_color=border["right"]["color"],
         )
-        styles.update(border_attrs)
+        styles |= border_attrs
 
         return styles

@@ -64,10 +64,7 @@ class HTMLWriterDefaults:
 
     @staticmethod
     def _to_dollar_format(v):
-        if not isinstance(v, (np.float, np.int)):
-            return v
-        r = "${:0,.0f}".format(v)
-        return r
+        return "${:0,.0f}".format(v) if isinstance(v, (np.float, np.int)) else v
 
     @staticmethod
     def data_value_func(df, dollar_columns=None):

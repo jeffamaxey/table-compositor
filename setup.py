@@ -24,8 +24,7 @@ ROOT_DIR_FP = path.abspath(path.dirname(__file__))
 def _get_requirements(file_name: str) -> tp.Iterator[str]:
     with open(path.join(ROOT_DIR_FP, file_name)) as f:
         for line in f:
-            line = line.strip()
-            if line:
+            if line := line.strip():
                 yield line
 
 

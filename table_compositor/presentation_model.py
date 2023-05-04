@@ -48,15 +48,19 @@ class IndexNode:
 
     @staticmethod
     def accumulate_values(node):
-        if not node.parent.parent:
-            return (node.value,)
-        return (*IndexNode.accumulate_values(node.parent), node.value)
+        return (
+            (*IndexNode.accumulate_values(node.parent), node.value)
+            if node.parent.parent
+            else (node.value,)
+        )
 
     @staticmethod
     def build_index(node):
-        if not node.parent.parent:
-            return (node.value,)
-        return (*IndexNode.accumulate_values(node.parent), node.value)
+        return (
+            (*IndexNode.accumulate_values(node.parent), node.value)
+            if node.parent.parent
+            else (node.value,)
+        )
 
     @staticmethod
     def index(node):
@@ -70,16 +74,14 @@ class IndexNode:
 
     @staticmethod
     def leaf_count(node, col_widths):
-        # this is for single hierarchical columns
-        if not node.children and not node.parent.parent:
-            return col_widths[node.value]
-        # multi-hierarchicial columns/index
-
-        # leaf in a multi-heirarchical index/column
-        if not node.children and node.parent.parent:
-            return col_widths[IndexNode.index(node)]
+        if not node.children:
+            return (
+                col_widths[IndexNode.index(node)]
+                if node.parent.parent
+                else col_widths[node.value]
+            )
         # FIXME: may not need this condition, for in-between nodes
-        if node.children and len(node.children[0].children) == 0:
+        if len(node.children[0].children) == 0:
             return sum(col_widths[IndexNode.index(c)] for c in node.children)
         return sum(IndexNode.leaf_count(n, col_widths) for n in node.children)
 
@@ -97,11 +99,7 @@ class IndexNode:
 
     @staticmethod
     def _apply_by_level(f, root):
-        if not root.parent:
-            q = deque(root.children)
-        else:
-            q = deque([root])
-
+        q = deque([root]) if root.parent else deque(root.children)
         while q:
             n = q.popleft()
             n.data = f(n)
@@ -177,8 +175,7 @@ class IndexNode:
             g = list(g)
             if len(g[0]) == 1:
                 # leaf node
-                for i in g:
-                    nodes.append(IndexNode(value=index.levels[level][i[0]]))
+                nodes.extend(IndexNode(value=index.levels[level][i[0]]) for i in g)
             else:
                 next_level = [i[1:] for i in g]
                 children = IndexNode._build_tree(index, next_level, level + 1)
@@ -209,7 +206,7 @@ class IndexNode:
 
         # make this immutable
         original_offsets = offsets
-        current_offsets = [x for x in original_offsets]
+        current_offsets = list(original_offsets)
         previous_level = 1
 
         def _resolve_loc(node):
@@ -246,7 +243,7 @@ class IndexNode:
         # make this immutable
 
         original_offsets = offsets
-        current_offsets = [x for x in original_offsets]
+        current_offsets = list(original_offsets)
         previous_level = 1
 
         def _resolve_loc(node):
@@ -423,19 +420,15 @@ def to_row_col_dict(
     locs = presentation_and_loc.locs
 
     row_col_dict = row_col_dict if row_col_dict is not None else {}
-    header_locs = locs.header_loc
     data_locs = locs.data_loc
-    index_locs = locs.index_loc
-    index_name_loc = locs.index_name_loc
-
-    if index_name_loc:
+    if index_name_loc := locs.index_name_loc:
         row_col_dict[LocOffsets(*index_name_loc)] = ValueAndStyleAttributes(
             presentation_model.index_name.values,
             presentation_model.index_name.style,
             nesting_level,
         )
 
-    if header_locs:
+    if header_locs := locs.header_loc:
         data = IndexNode.gather_data(
             header_locs,
             presentation_model.header.values,
@@ -447,7 +440,7 @@ def to_row_col_dict(
         }
         row_col_dict.update(data)
 
-    if index_locs:
+    if index_locs := locs.index_loc:
         data = IndexNode.gather_data(
             index_locs,
             presentation_model.index_label.values,
@@ -502,10 +495,7 @@ class PresentationLayoutManager:
         # this is useful for value_func where values rarely change
         if f is None:
             # we only need the copy operation for dataframe. For SF we get that for free!
-            if hasattr(df, "copy"):
-                return df.copy()
-            return df
-
+            return df.copy() if hasattr(df, "copy") else df
         df_new = pd.DataFrame(index=df.index._index, columns=df.columns._index)
         index_length = len(df_new.index)
         for c in df_new.columns.values:
@@ -543,10 +533,12 @@ class PresentationLayoutManager:
         col_widths = PresentationLayoutManager.widths(presentation_model.data.values)
         row_hts = PresentationLayoutManager.heights(presentation_model.data.values)
         header_length = (
-            1 if not hasattr(df_view.columns, "levels") else len(df_view.columns.levels)
+            len(df_view.columns.levels)
+            if hasattr(df_view.columns, "levels")
+            else 1
         )
         index_length = (
-            1 if not hasattr(df_view.index, "levels") else len(df_view.index.levels)
+            len(df_view.index.levels) if hasattr(df_view.index, "levels") else 1
         )
 
         if presentation_model.kwargs["hide_index"]:
@@ -723,8 +715,8 @@ class PresentationLayoutManager:
         widths = PresentationLayoutManager.widths(df_view)
         w = 0
         if not hide_index:
-            w = 1 if not hasattr(df_view.index, "levels") else len(df_view.index.levels)
-        return sum(w for w in widths.values()) + w
+            w = len(df_view.index.levels) if hasattr(df_view.index, "levels") else 1
+        return sum(widths.values()) + w
 
     @staticmethod
     def height(df_view, hide_header):
@@ -732,11 +724,11 @@ class PresentationLayoutManager:
         col_ht = 0
         if not hide_header:
             col_ht = (
-                1
-                if not hasattr(df_view.columns, "levels")
-                else len(df_view.columns.levels)
+                len(df_view.columns.levels)
+                if hasattr(df_view.columns, "levels")
+                else 1
             )
-        return sum(w for w in heights.values()) + col_ht
+        return sum(heights.values()) + col_ht
 
 
 def _shift_cols(offset):

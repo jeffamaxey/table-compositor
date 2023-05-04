@@ -26,7 +26,4 @@ def df_type_to_str(i):
         return str(i)
     if i is pd.NaT:  # not identified as a float null
         return "NaN"
-    if isinstance(i, numbers.Number):
-        return i
-
-    return str(i)
+    return i if isinstance(i, numbers.Number) else str(i)
